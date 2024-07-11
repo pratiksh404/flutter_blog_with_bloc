@@ -4,25 +4,22 @@ import 'package:blog/features/auth/domain/entities/user.dart';
 import 'package:blog/features/auth/domain/repositories/auth_repository.dart';
 import 'package:fpdart/src/either.dart';
 
-class SignUp implements UseCase<User, SignUpParams> {
+class SignIn implements UseCase<User, SignInParams> {
   final AuthRepository authRepository;
 
-  SignUp({required this.authRepository});
+  SignIn({required this.authRepository});
   @override
-  Future<Either<Failure, User>> call(SignUpParams params) async {
-    return await authRepository.signUp(
-      name: params.name,
+  Future<Either<Failure, User>> call(SignInParams params) async {
+    return await authRepository.signIn(
       email: params.email,
       password: params.password,
     );
   }
 }
 
-class SignUpParams {
-  final String name;
+class SignInParams {
   final String email;
   final String password;
 
-  SignUpParams(
-      {required this.name, required this.email, required this.password});
+  SignInParams({required this.email, required this.password});
 }

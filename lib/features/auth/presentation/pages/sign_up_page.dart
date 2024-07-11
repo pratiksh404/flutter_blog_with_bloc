@@ -1,4 +1,6 @@
+import 'package:blog/core/common/widgets/loader.dart';
 import 'package:blog/core/theme/palette.dart';
+import 'package:blog/core/utils/app_snackbar.dart';
 import 'package:blog/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:blog/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:blog/features/auth/presentation/widgets/gradient_button.dart';
@@ -34,65 +36,79 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(15.0),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                "Sign Up",
-                style: TextStyle(
-                  fontSize: 50.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 30),
-              TextForm(
-                hintText: "Name",
-                controller: nameController,
-              ),
-              const SizedBox(height: 10),
-              TextForm(
-                hintText: "Email",
-                controller: emailController,
-              ),
-              const SizedBox(height: 10),
-              TextForm(
-                hintText: "Password",
-                controller: passwordController,
-              ),
-              const SizedBox(height: 20),
-              GradientButton(
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      context.read<AuthBloc>().add(
-                            AuthSignUp(
-                              name: nameController.text,
-                              email: emailController.text,
-                              password: passwordController.text,
-                            ),
-                          );
-                    }
-                  },
-                  text: "Sign Up"),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const SignInPage()));
-                },
-                child: RichText(
-                    text: const TextSpan(
-                        text: "Already have an account? ",
-                        style: TextStyle(color: Colors.white),
-                        children: [
-                      TextSpan(
-                          text: " Sign In",
-                          style: TextStyle(color: Palette.gradient2))
-                    ])),
-              )
-            ],
-          ),
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthSuccess) {
+              // Success SnackBar
+              showSnackBar(context, "Sign Up Successful");
+            }
+          },
+          builder: (context, state) {
+            return state is AuthLoading
+                ? const Loader()
+                : Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            fontSize: 50.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        TextForm(
+                          hintText: "Name",
+                          controller: nameController,
+                        ),
+                        const SizedBox(height: 10),
+                        TextForm(
+                          hintText: "Email",
+                          controller: emailController,
+                        ),
+                        const SizedBox(height: 10),
+                        TextForm(
+                          hintText: "Password",
+                          controller: passwordController,
+                        ),
+                        const SizedBox(height: 20),
+                        GradientButton(
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                context.read<AuthBloc>().add(
+                                      AuthSignUp(
+                                        name: nameController.text,
+                                        email: emailController.text,
+                                        password: passwordController.text,
+                                      ),
+                                    );
+                              }
+                            },
+                            text: "Sign Up"),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const SignInPage()));
+                          },
+                          child: RichText(
+                              text: const TextSpan(
+                                  text: "Already have an account? ",
+                                  style: TextStyle(color: Colors.white),
+                                  children: [
+                                TextSpan(
+                                    text: " Sign In",
+                                    style: TextStyle(color: Palette.gradient2))
+                              ])),
+                        )
+                      ],
+                    ),
+                  );
+          },
         ),
       ),
     );

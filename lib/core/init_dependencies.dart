@@ -2,6 +2,7 @@ import 'package:blog/features/auth/data/datasources/auth_remote_data_source.dart
 import 'package:blog/features/auth/data/datasources/auth_remote_data_source_impl.dart';
 import 'package:blog/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:blog/features/auth/domain/repositories/auth_repository.dart';
+import 'package:blog/features/auth/domain/usecases/sign_in.dart';
 import 'package:blog/features/auth/domain/usecases/sign_up.dart';
 import 'package:blog/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -33,23 +34,30 @@ void _dependencies() {
 // Auth
 void _initAuth() {
   // Auth data source dependencies
-  serviceLocator.registerFactory<AuthRemoteDataSource>(
-      () => AuthRemoteDataSourceImpl(client: serviceLocator<SupabaseClient>()));
-  // Auth repository dependencies
-  serviceLocator.registerFactory<AuthRepository>(() => AuthRepositoryImpl(
-        authRemoteDataSource: serviceLocator<AuthRemoteDataSource>(),
-      ));
-  // SignUp usecase dependencies
-  serviceLocator.registerFactory(
-    () => SignUp(
-      authRepository: serviceLocator<AuthRepository>(),
-    ),
-  );
-
-  // Auth bloc dependencies
-  serviceLocator.registerLazySingleton(
-    () => AuthBloc(
-      signUp: serviceLocator<SignUp>(),
-    ),
-  );
+  serviceLocator
+    ..registerFactory<AuthRemoteDataSource>(() =>
+        AuthRemoteDataSourceImpl(client: serviceLocator<SupabaseClient>()))
+    // Auth repository dependencies
+    ..registerFactory<AuthRepository>(() => AuthRepositoryImpl(
+          authRemoteDataSource: serviceLocator<AuthRemoteDataSource>(),
+        ))
+    // SignUp usecase dependencies
+    ..registerFactory(
+      () => SignUp(
+        authRepository: serviceLocator<AuthRepository>(),
+      ),
+    )
+    // SignIn usecase dependencies
+    ..registerFactory(
+      () => SignIn(
+        authRepository: serviceLocator<AuthRepository>(),
+      ),
+    )
+    // Auth bloc dependencies
+    ..registerLazySingleton(
+      () => AuthBloc(
+        signUp: serviceLocator<SignUp>(),
+        signIn: serviceLocator<SignIn>(),
+      ),
+    );
 }
