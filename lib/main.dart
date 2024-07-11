@@ -1,3 +1,4 @@
+import 'package:blog/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,6 +16,9 @@ Future<void> main() async {
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(
+        create: (context) => serviceLocator<AppUserCubit>(),
+      ),
+      BlocProvider(
         create: (context) => serviceLocator<AuthBloc>(),
       ),
     ],
@@ -22,8 +26,19 @@ Future<void> main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthBloc>().add(AuthCheck());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +46,17 @@ class MyApp extends StatelessWidget {
       title: 'Blog App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkThemeMode,
-      home: const SignInPage(),
+      home: BlocSelector<AppUserCubit, AppUserState, bool>(
+        selector: (state) {
+          return state is AppUserLoggedIn;
+        },
+        builder: (context, isLoggedIn) {
+          return isLoggedIn
+              ? const Scaffold(
+                  body: const Center(child: const Text('Logged In')))
+              : const SignInPage();
+        },
+      ),
     );
   }
 }
