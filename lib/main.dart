@@ -1,4 +1,5 @@
 import 'package:blog/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:blog/features/blog/presentation/pages/home_blog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -51,10 +52,7 @@ class _MyAppState extends State<MyApp> {
           return state is AppUserLoggedIn;
         },
         builder: (context, isLoggedIn) {
-          return isLoggedIn
-              ? const Scaffold(
-                  body: const Center(child: const Text('Logged In')))
-              : const SignInPage();
+          return isLoggedIn ? const BlogHome() : const SignInPage();
         },
       ),
     );
